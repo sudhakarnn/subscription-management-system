@@ -1,3 +1,4 @@
+
 import sys
 from os.path import abspath, dirname
 from logging.config import fileConfig
@@ -10,26 +11,34 @@ sys.path.insert(0, dirname(dirname(abspath(__file__))))
 
 from app.core.config import settings
 from app.core.database import Base
-# Import all models here so Alembic can discover them
-from app.modules.auth.models import User
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
+# Import all models so Alembic can discover their tables
+from app.modules.auth.models import User
+from app.modules.customers.models import Customer
+from app.modules.products.models import Product
+from app.modules.plans.models import Plan
+
+# Alembic configuration
 config = context.config
 
-# Set DB URL dynamically from application settings
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+# Set database URL dynamically
+config.set_main_option(
+    "sqlalchemy.url",
+    settings.DATABASE_URL.replace("%", "%%")
+)
 
-# Interpret the config file for Python logging.
+# Configure logging
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+# Register model metadata
 target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    """Run migrations in 'offline' mode."""
+    """Run migrations in offline mode."""
     url = config.get_main_option("sqlalchemy.url")
+
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -42,7 +51,7 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode."""
+    """Run migrations in online mode."""
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
