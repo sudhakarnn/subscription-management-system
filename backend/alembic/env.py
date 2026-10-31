@@ -17,7 +17,7 @@ from app.modules.auth.models import User
 from app.modules.customers.models import Customer
 from app.modules.products.models import Product
 from app.modules.plans.models import Plan
-
+from app.modules.subscriptions.models import Subscription
 # Alembic configuration
 config = context.config
 
