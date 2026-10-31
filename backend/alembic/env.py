@@ -18,6 +18,11 @@ from app.modules.customers.models import Customer
 from app.modules.products.models import Product
 from app.modules.plans.models import Plan
 from app.modules.subscriptions.models import Subscription
+from app.modules.invoices.models import Invoice
+from app.modules.payments.models import Payment
+from app.modules.taxes.models import Tax
+from app.modules.discounts.models import Discount
+from app.modules.quotations.models import Quotation
 # Alembic configuration
 config = context.config
 

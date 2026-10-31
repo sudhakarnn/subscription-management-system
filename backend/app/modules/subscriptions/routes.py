@@ -18,6 +18,9 @@ from app.modules.subscriptions.services import (
     list_subscriptions,
     get_subscription,
     update_subscription,
+    cancel_subscription,
+    renew_subscription,
+    delete_subscription,
 )
 
 
@@ -58,3 +61,31 @@ def edit_subscription(
     current_user=Depends(require_staff_or_admin),
 ):
     return update_subscription(db, subscription_id, data)
+
+
+@router.post("/{subscription_id}/cancel", response_model=SubscriptionResponse)
+def cancel_sub(
+    subscription_id: UUID,
+    reason: str | None = None,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_staff_or_admin),
+):
+    return cancel_subscription(db, subscription_id, reason or "Cancelled by administrator")
+
+
+@router.post("/{subscription_id}/renew", response_model=SubscriptionResponse)
+def renew_sub(
+    subscription_id: UUID,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_staff_or_admin),
+):
+    return renew_subscription(db, subscription_id)
+
+
+@router.delete("/{subscription_id}")
+def remove_subscription(
+    subscription_id: UUID,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_staff_or_admin),
+):
+    return delete_subscription(db, subscription_id)

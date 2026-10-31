@@ -9,7 +9,7 @@ from sqlalchemy import (
     ForeignKey,
 )
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from app.core.database import Base
@@ -31,6 +31,16 @@ class Customer(Base):
         nullable=False,
         index=True,
     )
+
+    user = relationship("app.modules.auth.models.User", lazy="joined")
+
+    @property
+    def email(self) -> str:
+        return self.user.email if self.user else ""
+
+    @property
+    def full_name(self) -> str:
+        return self.user.full_name if self.user else ""
 
     phone: Mapped[str | None] = mapped_column(
         String(20), nullable=True

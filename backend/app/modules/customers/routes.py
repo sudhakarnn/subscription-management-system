@@ -18,6 +18,7 @@ from app.modules.customers.services import (
     get_customer,
     update_customer,
     update_customer_status,
+    delete_customer,
 )
 
 
@@ -85,3 +86,12 @@ def change_customer_status(
     current_user=Depends(require_staff_or_admin),
 ):
     return update_customer_status(db, customer_id, data.is_active)
+
+
+@router.delete("/{customer_id}")
+def remove_customer(
+    customer_id: UUID,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_staff_or_admin),
+):
+    return delete_customer(db, customer_id)

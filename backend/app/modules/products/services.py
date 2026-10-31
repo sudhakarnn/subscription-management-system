@@ -24,7 +24,7 @@ def create_product(db: Session, data: ProductCreate):
     return product
 
 
-def list_products(db: Session, search=None, page=1, limit=10, active_only=False):
+def list_products(db: Session, search=None, page=1, limit=100, active_only=False):
     query = select(Product)
 
     if search:
@@ -69,3 +69,10 @@ def update_product(db: Session, product_id: UUID, data: ProductUpdate):
     db.commit()
     db.refresh(product)
     return product
+
+
+def delete_product(db: Session, product_id: UUID):
+    product = get_product(db, product_id)
+    db.delete(product)
+    db.commit()
+    return {"message": "Product deleted successfully"}

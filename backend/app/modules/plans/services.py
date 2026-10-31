@@ -25,7 +25,7 @@ def create_plan(db: Session, data: PlanCreate):
     return plan
 
 
-def list_plans(db: Session, product_id=None, search=None, page=1, limit=10, active_only=False):
+def list_plans(db: Session, product_id=None, search=None, page=1, limit=100, active_only=False):
     query = select(Plan)
 
     if product_id:
@@ -62,3 +62,10 @@ def update_plan(db: Session, plan_id: UUID, data: PlanUpdate):
     db.commit()
     db.refresh(plan)
     return plan
+
+
+def delete_plan(db: Session, plan_id: UUID):
+    plan = get_plan(db, plan_id)
+    db.delete(plan)
+    db.commit()
+    return {"message": "Plan deleted successfully"}

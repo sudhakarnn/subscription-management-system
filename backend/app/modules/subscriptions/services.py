@@ -1,5 +1,5 @@
 
-from datetime import date
+from datetime import date, timedelta
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -88,3 +88,40 @@ def update_subscription(db: Session, subscription_id: UUID, data):
     db.refresh(subscription)
 
     return subscription
+
+
+def cancel_subscription(db: Session, subscription_id: UUID, reason: str | None = "Customer requested cancellation"):
+    subscription = get_subscription(db, subscription_id)
+    subscription.status = "cancelled"
+    subscription.cancellation_reason = reason
+    db.commit()
+    db.refresh(subscription)
+    return subscription
+
+
+def renew_subscription(db: Session, subscription_id: UUID):
+    subscription = get_subscription(db, subscription_id)
+    plan = db.get(Plan, subscription.plan_id)
+
+    current_billing = subscription.next_billing_date or date.today()
+    if plan and plan.billing_interval == "yearly":
+        new_billing = current_billing + timedelta(days=365)
+    else:
+        new_billing = current_billing + timedelta(days=30)
+
+    subscription.next_billing_date = new_billing
+    subscription.status = "active"
+
+    # Create new invoice for the renewal period
+    create_invoice_for_subscription(db, subscription)
+
+    db.commit()
+    db.refresh(subscription)
+    return subscription
+
+
+def delete_subscription(db: Session, subscription_id: UUID):
+    subscription = get_subscription(db, subscription_id)
+    db.delete(subscription)
+    db.commit()
+    return {"message": "Subscription deleted successfully"}

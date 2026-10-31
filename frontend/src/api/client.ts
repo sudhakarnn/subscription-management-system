@@ -13,7 +13,7 @@ export const apiClient = axios.create({
 // Request interceptor to attach JWT token
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('brightloop_token');
+    const token = localStorage.getItem('access_token') || localStorage.getItem('brightloop_token');
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -28,6 +28,7 @@ apiClient.interceptors.response.use(
   (error: AxiosError) => {
     if (error.response?.status === 401) {
       // Clear token on authentication failure
+      localStorage.removeItem('access_token');
       localStorage.removeItem('brightloop_token');
     }
     return Promise.reject(error);

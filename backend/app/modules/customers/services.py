@@ -5,7 +5,8 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.modules.auth.models import User
+from app.core.security import hash_password, validate_password_strength
+from app.modules.auth.models import User, UserRole
 from app.modules.customers.models import Customer
 from app.modules.customers.schemas import CustomerCreate, CustomerUpdate
 
@@ -18,11 +19,17 @@ def create_customer(db: Session, data: CustomerCreate):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
+    try:
+        validate_password_strength(data.password)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
     user = User(
         email=data.email,
-        password=data.password,
+        hashed_password=hash_password(data.password),
         full_name=data.full_name,
-        role="customer",
+        role=UserRole.CUSTOMER,
+        is_active=True,
     )
 
     db.add(user)
@@ -88,3 +95,13 @@ def update_customer_status(db: Session, customer_id: UUID, is_active: bool):
     db.refresh(customer)
 
     return customer
+
+
+def delete_customer(db: Session, customer_id: UUID):
+    customer = get_customer(db, customer_id)
+    user = db.get(User, customer.user_id)
+    db.delete(customer)
+    if user:
+        db.delete(user)
+    db.commit()
+    return {"message": "Customer deleted successfully"}

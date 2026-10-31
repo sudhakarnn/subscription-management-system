@@ -26,6 +26,9 @@ class SubscriptionResponse(BaseModel):
     id: UUID
     customer_id: UUID
     plan_id: UUID
+    customer_name: str | None = None
+    customer_email: str | None = None
+    plan_name: str | None = None
     status: str
     start_date: date
     end_date: date | None

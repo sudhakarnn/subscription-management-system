@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   AlertCircle,
   ShieldCheck,
+  LogOut,
 } from 'lucide-react';
 import { checkBackendHealth } from '../api/client';
 
@@ -222,6 +223,21 @@ export const DashboardLayout: React.FC = () => {
               <ShieldCheck className="w-3.5 h-3.5 text-brand-500" />
               <span>Admin</span>
             </div>
+
+            {/* Logout Button */}
+            <button
+              onClick={() => {
+                localStorage.removeItem('access_token');
+                localStorage.removeItem('brightloop_token');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+              }}
+              className="inline-flex items-center space-x-1 px-2.5 py-1 text-xs font-medium text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-md border border-slate-200 transition"
+              title="Sign out"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Logout</span>
+            </button>
           </div>
         </header>
 

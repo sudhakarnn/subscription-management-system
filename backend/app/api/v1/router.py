@@ -12,6 +12,7 @@ from app.modules.invoices.routes import router as invoices_router
 api_router = APIRouter()
 
 api_router.include_router(auth_router)
+api_router.include_router(auth_router, prefix="/auth")
 api_router.include_router(customers_router)
 api_router.include_router(products_router)
 api_router.include_router(plans_router)

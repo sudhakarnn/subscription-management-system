@@ -18,6 +18,7 @@ from app.modules.plans.services import (
     list_plans,
     get_plan,
     update_plan,
+    delete_plan,
 )
 
 
@@ -58,3 +59,12 @@ def edit_plan(
     current_user=Depends(require_staff_or_admin),
 ):
     return update_plan(db, plan_id, data)
+
+
+@router.delete("/{plan_id}")
+def remove_plan(
+    plan_id: UUID,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_staff_or_admin),
+):
+    return delete_plan(db, plan_id)

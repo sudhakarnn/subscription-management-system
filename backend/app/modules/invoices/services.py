@@ -1,6 +1,6 @@
-
 import uuid
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
+from decimal import Decimal
 
 from fastapi import HTTPException
 from sqlalchemy import select
@@ -17,7 +17,8 @@ def create_invoice_for_subscription(db: Session, subscription):
         issue_date=date.today(),
         due_date=date.today() + timedelta(days=7),
         subtotal=subscription.price,
-        tax_amount=0,
+        tax_amount=Decimal(0),
+        discount_amount=Decimal(0),
         total_amount=subscription.price,
         currency=subscription.currency,
         status="unpaid",
@@ -38,4 +39,16 @@ def get_invoice(db: Session, invoice_id: uuid.UUID):
     if not invoice:
         raise HTTPException(status_code=404, detail="Invoice not found")
 
+    return invoice
+
+
+def mark_invoice_as_paid(db: Session, invoice_id: uuid.UUID):
+    invoice = get_invoice(db, invoice_id)
+    if invoice.status == "paid":
+        return invoice
+
+    invoice.status = "paid"
+    invoice.paid_at = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(invoice)
     return invoice

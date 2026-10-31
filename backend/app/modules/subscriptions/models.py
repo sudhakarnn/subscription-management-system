@@ -11,7 +11,7 @@ from sqlalchemy import (
     Text,
 )
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from app.core.database import Base
@@ -39,6 +39,21 @@ class Subscription(Base):
         nullable=False,
         index=True,
     )
+
+    customer = relationship("app.modules.customers.models.Customer", lazy="joined")
+    plan = relationship("app.modules.plans.models.Plan", lazy="joined")
+
+    @property
+    def customer_name(self) -> str:
+        return self.customer.full_name if self.customer else ""
+
+    @property
+    def customer_email(self) -> str:
+        return self.customer.email if self.customer else ""
+
+    @property
+    def plan_name(self) -> str:
+        return self.plan.name if self.plan else ""
 
     status: Mapped[str] = mapped_column(
         String(30),

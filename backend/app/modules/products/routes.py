@@ -12,6 +12,7 @@ from app.modules.products.services import (
     list_products,
     get_product,
     update_product,
+    delete_product,
 )
 
 router = APIRouter(prefix="/products", tags=["Products"])
@@ -51,3 +52,12 @@ def edit_product(
     current_user=Depends(require_staff_or_admin),
 ):
     return update_product(db, product_id, data)
+
+
+@router.delete("/{product_id}")
+def remove_product(
+    product_id: UUID,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_staff_or_admin),
+):
+    return delete_product(db, product_id)
